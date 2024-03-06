@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebGL Segitiga dan Persegi dengan Jarak Antara Mereka</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gl-matrix/2.8.1/gl-matrix-min.js"></script>
+</head>
+<body>
+    <canvas id="webgl-canvas" width="400" height="400" style="border:1px solid black;"></canvas>
+    <script>
+        window.onload = function () {
+            // Mendapatkan referensi ke elemen canvas
+            var canvas = document.getElementById('webgl-canvas');
+            var gl = canvas.getContext('webgl');
+
+            // Inisialisasi verteks segitiga siku-siku
+            var triangleVertices = new Float32Array([
+                0.25, 0.5,  // Posisi verteks kiri bawah
+                 0.5, 0.0,  // Posisi verteks kanan bawah
+                0.0,  0.0   // Posisi verteks kiri atas
+            ]);
+
+            // Inisialisasi verteks persegi
+            var squareVertices = new Float32Array([
+                 -0.2,  -0.4,  // Posisi verteks kanan atas
+                -0.8,  -0.4,  // Posisi verteks kiri atas
+                 -0.2, -0.8,  // Posisi verteks kanan bawah
+                -0.8, -0.8   // Posisi verteks kiri bawah
+            ]);
+
+            // Membuat buffer untuk segitiga siku-siku
+            var triangleVertexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, triangleVertices, gl.STATIC_DRAW);
+
+            // Membuat buffer untuk persegi
+            var squareVertexBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, squareVertices, gl.STATIC_DRAW);
+
+            // Mendefinisikan shader vertex untuk segitiga siku-siku
+            var triangleVertexShaderSource = `
+                attribute vec2 a_position;
+                uniform mat4 u_modelViewMatrix;
+                void main() {
+                    gl_Position = u_modelViewMatrix * vec4(a_position, 0.0, 1.0);
+                }
+            `;
+            var triangleVertexShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(triangleVertexShader, triangleVertexShaderSource);
+            gl.compileShader(triangleVertexShader);
+
+            // Mendefinisikan shader fragment untuk segitiga siku-siku (warna kuning)
+            var triangleFragmentShaderSource = `
+                precision mediump float;
+                void main() {
+                    gl_FragColor = vec4(1.0, 1.0, 0.0, 1.0);
+                }
+            `;
+            var triangleFragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(triangleFragmentShader, triangleFragmentShaderSource);
+            gl.compileShader(triangleFragmentShader);
+
+            // Membuat program shader untuk segitiga siku-siku
+            var triangleShaderProgram = gl.createProgram();
+            gl.attachShader(triangleShaderProgram, triangleVertexShader);
+            gl.attachShader(triangleShaderProgram, triangleFragmentShader);
+            gl.linkProgram(triangleShaderProgram);
+            gl.useProgram(triangleShaderProgram);
+
+            // Mengatur atribut posisi untuk segitiga siku-siku
+            var trianglePositionLocation = gl.getAttribLocation(triangleShaderProgram, 'a_position');
+            gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexBuffer);
+            gl.vertexAttribPointer(trianglePositionLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(trianglePositionLocation);
+
+            // Membuat buffer untuk matriks model-view segitiga siku-siku
+            var triangleModelViewMatrix = gl.getUniformLocation(triangleShaderProgram, 'u_modelViewMatrix');
+            var triangleMvMatrix = mat4.create();
+            mat4.translate(triangleMvMatrix, triangleMvMatrix, [-0.5, 0.0, 0.0]);
+
+            // Mengirim matriks model-view ke shader program segitiga siku-siku
+            gl.uniformMatrix4fv(triangleModelViewMatrix, false, triangleMvMatrix);
+
+            // Menggambar segitiga siku-siku
+            gl.drawArrays(gl.TRIANGLES, 0, 3);
+
+            // Mendefinisikan shader vertex untuk persegi
+            var squareVertexShaderSource = `
+                attribute vec2 a_position;
+                uniform mat4 u_modelViewMatrix;
+                void main() {
+                    gl_Position = u_modelViewMatrix * vec4(a_position, 0.0, 1.0);
+                }
+            `;
+            var squareVertexShader = gl.createShader(gl.VERTEX_SHADER);
+            gl.shaderSource(squareVertexShader, squareVertexShaderSource);
+            gl.compileShader(squareVertexShader);
+
+            // Mendefinisikan shader fragment untuk persegi (warna biru)
+            var squareFragmentShaderSource = `
+                precision mediump float;
+                void main() {
+                    gl_FragColor = vec4(0.0, 0.0, 1.0, 1.0);
+                }
+            `;
+            var squareFragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+            gl.shaderSource(squareFragmentShader, squareFragmentShaderSource);
+            gl.compileShader(squareFragmentShader);
+
+            // Membuat program shader untuk persegi
+            var squareShaderProgram = gl.createProgram();
+            gl.attachShader(squareShaderProgram, squareVertexShader);
+            gl.attachShader(squareShaderProgram, squareFragmentShader);
+            gl.linkProgram(squareShaderProgram);
+            gl.useProgram(squareShaderProgram);
+
+            // Mengatur atribut posisi untuk persegi
+            var squarePositionLocation = gl.getAttribLocation(squareShaderProgram, 'a_position');
+            gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexBuffer);
+            gl.vertexAttribPointer(squarePositionLocation, 2, gl.FLOAT, false, 0, 0);
+            gl.enableVertexAttribArray(squarePositionLocation);
+
+            // Membuat buffer untuk matriks model-view persegi
+            var squareModelViewMatrix = gl.getUniformLocation(squareShaderProgram, 'u_modelViewMatrix');
+            var squareMvMatrix = mat4.create();
+            mat4.translate(squareMvMatrix, squareMvMatrix, [0.5, 0.0, 0.0]);
+
+            // Mengirim matriks model-view ke shader program persegi
+            gl.uniformMatrix4fv(squareModelViewMatrix, false, squareMvMatrix);
+
+            // Menggambar persegi
+            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+        };
+    </script>
+</body>
+</html>
