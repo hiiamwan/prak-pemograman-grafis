@@ -8,18 +8,18 @@
     <canvas id="webgl-canvas" width="400" height="400" style="border:1px solid black;"></canvas>
     <script>
         window.onload = function () {
-            // Mendapatkan referensi ke elemen canvas
+            //  elemen canvas
             var canvas = document.getElementById('webgl-canvas');
             var gl = canvas.getContext('webgl');
 
-            // Inisialisasi verteks segitiga siku-siku
+            // verteks segitiga siku-siku
             var triangleVertices = new Float32Array([
                 0.25, 0.5,  // Posisi verteks kiri bawah
                  0.5, 0.0,  // Posisi verteks kanan bawah
                 0.0,  0.0   // Posisi verteks kiri atas
             ]);
 
-            // Inisialisasi verteks persegi
+            // verteks persegi
             var squareVertices = new Float32Array([
                  -0.2,  -0.4,  // Posisi verteks kanan atas
                 -0.8,  -0.4,  // Posisi verteks kiri atas
